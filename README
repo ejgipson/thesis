@@ -1,0 +1,41 @@
+#### VASP ####
+In current working directory, place LATREF, HEAD, BODY, and MAGMA_ABC.
+
+>LATREF contains the abc Magma code value on the line associated with graphene lattice number. 
+>HEAD contains the POSCAR header which is static for a given configuration
+>BODY contains the static position (x,y,z) location information for 32 atoms in the graphene lattice. 
+>MAGMA_ABC contains the abc indicator from the Magma output code including brackets, spaces, and new tabs.
+
+ejgipson@MBP ~ % bash makePOSCAR.sh
+
+Given the MAGMA_ABC file, makePOSCAR.sh creates a new directory for each configuration specified in the MAGMA_ABC file and sends the relevent subsection of MAGMA_ABC (PREPOS$j) to that directory as the file PREPOS. 
+
+makePOSCAR.sh then uses a for loop to step into the newly made directories, and makes the POSCAR file for the given job. This is achieved by performing the following steps:
+
+1. The formatting in PREPOS is stripped away using a series of sed commands
+2. The abc values in PREPOS are mapped to their LATREF counterparts and the lattice numbers for the impurities are stored in REPLACE as a file which is then sent to REPLACE as an array
+3. An array called LAT is made that contains integer values 1 through 32
+4. LAT array elements that equal the values of the REPLACE array are set to zero
+5. The content of LAT (including zeros) is written to a temporry file called TEMP
+6. The contents of TEMP are sorted numerically and stored in the temporary file TEMP2
+7. The zeros are stripped from TEMP2 and the remaining information is written to the temporary file TEMP
+8. The replacement lattice numbers are appended to TEMP
+9. The header information stored in cp ../HEAD is written to POSCAR
+5. The ith line value of TEMP is used to point to the line number in ../BODY and the content of ../BODY is appended to POSCAR
+
+In the same Big Daddy Directory (TM), place the appropriately built POTCAR file along with INCAR, KPOINTS, and RUN_VASP6. The RUN_VASP6 file should have job-name=XXXXX. 
+
+ejgipson@MBP ~ % bash populate.sh
+
+populate.sh uses a for loop to step through the newly made directories and copies the POTCAR, INCAR, KPOINTS, and RUN_VASP6 files and then renames the job as $K. As a check, the updated name of the job is printed to the command line. 
+
+ejgipson@MBP ~ % sbatch SUBMIT
+
+SUBMIT requests a node on ARCC that handles submitting the VASP jobs in batches of 10 and then checks the submissions for an Open MPI failure. If there is no failure, SUBMIT releases the node. If there is a failure, the VASP job is canceled and resubmitted. 
+
+ejgipson@MBP ~ % bash REPORT.sh
+
+REPORT.sh pulls the total energy (TOTEN) from the resultant OUTCAR file for each job and writes it to the raw text file OUT
+
+#### POSPROCESSING ####
+Plot the Density of States (DOS) and Band Structure Diagrams (BSD) for a VASP job using DOS_BSD.py. Need DOSCAR and EIGENVAL files and paths.

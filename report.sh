@@ -1,8 +1,6 @@
-rm OUT
-touch OUT
-echo "job-name          TOTEN (eV)" >> OUT
-touch TEMP
-for i in *-*
+# Pull job name from RUN_VASP6 and total energy from OUTCAR
+#job-name      TOTEN (eV)
+for i in */
 do
 cd $i
 	sed -n -e 's/^.*job-name=//p' RUN_VASP6 > ../TEMP

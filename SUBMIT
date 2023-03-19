@@ -1,0 +1,22 @@
+#!/bin/bash
+#SBATCH --job-name=subANDchk
+#SBATCH --account=designlab
+#SBATCH --time=8:00:00
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=egipson@uwyo.edu
+#
+##Resource Request (2servers, 32 mpi-tasks/server.4GB menory/cpu_core)
+##In this case an mpi-task is equivalent to a cpu core
+#
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem=1GB
+#SBATCH --cpus-per-task=1
+#
+bash submit.sh
+bash check.sh
+sleep 600s
+bash check.sh
+#
+echo "You are so pretty and smart."
+
